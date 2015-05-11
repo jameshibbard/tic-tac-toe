@@ -1,0 +1,66 @@
+#messages h1 {
+    font-size: 1.8em;
+}
+* {
+    font-family: 'Chewy', cursive;
+}
+
+#messages p:first-letter {
+    font-size: 1.3em;
+}
+
+#messages p {
+    color: #7f7f7e;
+}
+
+#messages {
+    margin: 10px;
+}
+
+.tic {
+    width: 30%;
+    height: 120px;
+    background-color: cornsilk;
+    border: 1px groove crimson;
+}
+
+.tic:nth-of-type(3n + 1) {
+    clear: both;
+}
+
+.tic {
+    cursor: pointer;
+    float: left;
+    font-size: 68px;
+    text-align: center;
+
+}
+
+.tic.x {
+    color: crimson;
+}
+
+.tic.o {
+    color: #3997ff ;
+}
+
+#messages {
+    display: none;
+}
+
+.alerts {
+    font-size: 24px;
+    text-align: center;
+}
+
+form div:last-of-type {
+    margin-top: 10px;
+}
+
+.alert-info.alerts {
+    display: none;
+}
+
+a.play-again {
+    font-size: 1.3em;
+}
