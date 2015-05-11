@@ -184,7 +184,7 @@
         }, 'slow');
       },
       addMessage: function(msg, nonVoidTag, classes, replaceContents, voidAnchor) {
-        var messagesContainer, _ref;
+        var addHref, messagesContainer;
         if (msg == null) {
           msg = "";
         }
@@ -205,10 +205,13 @@
         if (replaceContents) {
           messagesContainer.html("");
         }
+        if (voidAnchor && nonVoidTag === 'a') {
+          addHref = 'href=\'JavaScript:void(0)\'';
+        } else {
+          addHref = "";
+        }
         if (msg) {
-          messagesContainer.append("<" + nonVoidTag + " " + ((_ref = voidAnchor && nonVoidTag === 'a') != null ? _ref : {
-            'href=\'JavaScript:void(0)\'': ''
-          }) + " class='" + classes + "'> " + msg + " </" + nonVoidTag + ">");
+          messagesContainer.append("<" + nonVoidTag + " " + addHref + " class='" + classes + "'> " + msg + " </" + nonVoidTag + ">");
         } else {
           messagesContainer.html("");
         }
@@ -219,8 +222,8 @@
     $("form").on("submit", function(evt) {
       var namesValid;
       evt.preventDefault();
-      namesValid = $("input:text").filter(function() {
-        return this.value.trim() === !"";
+      namesValid = $("input[type='text']").filter(function() {
+        return this.value.trim() !== "";
       }).length === 2;
       if (namesValid) {
         return Tic.initialize();
@@ -229,7 +232,7 @@
       }
     });
     $(".close").click(function() {
-      return $(this).parents(".alerts").slideUp('slow');
+      return $(this).parent().slideUp('slow');
     });
     return $("body").on("click", ".play-again", function() {
       return Tic.initialize();

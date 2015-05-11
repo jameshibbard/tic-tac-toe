@@ -133,7 +133,8 @@ $ ->
       messagesContainer = $("#messages")
       messagesContainer.hide()
       if replaceContents then messagesContainer.html ""
-      if msg then messagesContainer.append("<#{nonVoidTag} #{voidAnchor && nonVoidTag is 'a' ? 'href=\'JavaScript:void(0)\'' : ''} class='#{classes}'> #{msg} </#{nonVoidTag}>")
+      if voidAnchor and nonVoidTag is 'a' then addHref =  'href=\'JavaScript:void(0)\'' else addHref = ""
+      if msg then messagesContainer.append("<#{nonVoidTag} #{addHref} class='#{classes}'> #{msg} </#{nonVoidTag}>")
       else messagesContainer.html ""
       messagesContainer.fadeIn 700
 
@@ -142,10 +143,10 @@ $ ->
 
   $("form").on "submit", (evt) ->
     evt.preventDefault()
-    namesValid = $("input:text").filter(->
-      return @value.trim() is not ""
+    namesValid = $("input[type='text']").filter(->
+      return @.value.trim() isnt ""
     ).length is 2
     if namesValid then Tic.initialize() else Tic.addAlert("Player names cannot be empty")
   $(".close").click ->
-    $(@).parents(".alerts").slideUp 'slow'
+    $(@).parent().slideUp 'slow'
   $("body").on("click",".play-again", -> Tic.initialize())
