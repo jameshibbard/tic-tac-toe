@@ -23,6 +23,12 @@ $ ->
       @addMessage(template, "div", "game-data")
 
     initialize: ->
+      playerData.player1 = $("input[name='pl-1']").val()
+      playerData.player2 = $("input[name='pl-2']").val()
+      playerData.p1stats = localStorage[playerData.player1] || wins: 0, loses: 0
+      if typeof playerData.p1stats is "string" then playerData.p1stats = JSON.parse playerData.p1stats
+      playerData.p2stats = localStorage[playerData.player2] || wins: 0, loses: 0
+      if typeof playerData.p2stats is "string" then playerData.p2stats = JSON.parse playerData.p2stats
       $("form").hide 'slow'
       $("#tic").html("")
       $(".alerts").slideUp 900
@@ -133,16 +139,13 @@ $ ->
 
 
   playerData = {}
+
   $("form").on "submit", (evt) ->
     evt.preventDefault()
-    playerData.player1 = $("input[name='pl-1']").val()
-    playerData.player2 = $("input[name='pl-2']").val()
-    if not playerData.player1 or not playerData.player2 then return Tic.addAlert("Player names cannot be empty")
-    playerData.p1stats = localStorage[playerData.player1] || wins: 0, loses: 0
-    if typeof playerData.p1stats is "string" then playerData.p1stats = JSON.parse playerData.p1stats
-    playerData.p2stats = localStorage[playerData.player2] || wins: 0, loses: 0
-    if typeof playerData.p2stats is "string" then playerData.p2stats = JSON.parse playerData.p2stats
-    Tic.initialize()
+    namesValid = $("input:text").filter(->
+      return @value.trim() is not ""
+    ).length is 2
+    if namesValid then Tic.initialize() else Tic.addAlert("Player names cannot be empty")
   $(".close").click ->
     $(@).parents(".alerts").slideUp 'slow'
   $("body").on("click",".play-again", -> Tic.initialize())

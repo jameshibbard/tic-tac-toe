@@ -31,6 +31,22 @@
       },
       initialize: function() {
         var tic, _i;
+        playerData.player1 = $("input[name='pl-1']").val();
+        playerData.player2 = $("input[name='pl-2']").val();
+        playerData.p1stats = localStorage[playerData.player1] || {
+          wins: 0,
+          loses: 0
+        };
+        if (typeof playerData.p1stats === "string") {
+          playerData.p1stats = JSON.parse(playerData.p1stats);
+        }
+        playerData.p2stats = localStorage[playerData.player2] || {
+          wins: 0,
+          loses: 0
+        };
+        if (typeof playerData.p2stats === "string") {
+          playerData.p2stats = JSON.parse(playerData.p2stats);
+        }
         $("form").hide('slow');
         $("#tic").html("");
         $(".alerts").slideUp(900);
@@ -201,27 +217,16 @@
     };
     playerData = {};
     $("form").on("submit", function(evt) {
+      var namesValid;
       evt.preventDefault();
-      playerData.player1 = $("input[name='pl-1']").val();
-      playerData.player2 = $("input[name='pl-2']").val();
-      if (!playerData.player1 || !playerData.player2) {
+      namesValid = $("input:text").filter(function() {
+        return this.value.trim() === !"";
+      }).length === 2;
+      if (namesValid) {
+        return Tic.initialize();
+      } else {
         return Tic.addAlert("Player names cannot be empty");
       }
-      playerData.p1stats = localStorage[playerData.player1] || {
-        wins: 0,
-        loses: 0
-      };
-      if (typeof playerData.p1stats === "string") {
-        playerData.p1stats = JSON.parse(playerData.p1stats);
-      }
-      playerData.p2stats = localStorage[playerData.player2] || {
-        wins: 0,
-        loses: 0
-      };
-      if (typeof playerData.p2stats === "string") {
-        playerData.p2stats = JSON.parse(playerData.p2stats);
-      }
-      return Tic.initialize();
     });
     $(".close").click(function() {
       return $(this).parents(".alerts").slideUp('slow');
