@@ -27,7 +27,7 @@
         template += "<p>" + playerData.player2 + " is playing " + randomRole2 + "</p>";
         template += "<p>" + playerData.player1 + " has " + playerData.p1stats.wins + " wins and " + playerData.p1stats.loses + " loses</p>";
         template += "<p>" + playerData.player2 + " has " + playerData.p2stats.wins + " wins and " + playerData.p2stats.loses + " loses</p>";
-        return this.addMessage(template, "div", "game-data");
+        return this.addMessage(template);
       },
       initialize: function() {
         var tic, _i;
@@ -64,7 +64,7 @@
           o: {},
           gameOver: true
         };
-        this.addMessage("Play Again?");
+        this.addMessage("<a href='JavaScript:void(0)' class='play-again'>Play Again?</a>");
         if (winningParty === "none") {
           this.addAlert("The game was a tie.");
           return false;
@@ -183,37 +183,21 @@
           scrollTop: $(".alerts").offset().top
         }, 'slow');
       },
-      addMessage: function(msg, nonVoidTag, classes, replaceContents, voidAnchor) {
-        var addHref, messagesContainer;
+      addMessage: function(msg, replaceContents) {
+        var messagesContainer;
         if (msg == null) {
           msg = "";
         }
-        if (nonVoidTag == null) {
-          nonVoidTag = "a";
-        }
-        if (classes == null) {
-          classes = "play-again";
-        }
         if (replaceContents == null) {
           replaceContents = true;
-        }
-        if (voidAnchor == null) {
-          voidAnchor = true;
         }
         messagesContainer = $("#messages");
         messagesContainer.hide();
         if (replaceContents) {
           messagesContainer.html("");
         }
-        if (voidAnchor && nonVoidTag === 'a') {
-          addHref = 'href=\'JavaScript:void(0)\'';
-        } else {
-          addHref = "";
-        }
         if (msg) {
-          messagesContainer.append("<" + nonVoidTag + " " + addHref + " class='" + classes + "'> " + msg + " </" + nonVoidTag + ">");
-        } else {
-          messagesContainer.html("");
+          messagesContainer.html(msg);
         }
         return messagesContainer.fadeIn(700);
       }

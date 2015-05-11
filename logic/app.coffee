@@ -20,7 +20,7 @@ $ ->
       template += "<p>#{playerData.player2} is playing #{randomRole2}</p>"
       template += "<p>#{playerData.player1} has #{playerData.p1stats.wins} wins and #{playerData.p1stats.loses} loses</p>"
       template += "<p>#{playerData.player2} has #{playerData.p2stats.wins} wins and #{playerData.p2stats.loses} loses</p>"
-      @addMessage(template, "div", "game-data")
+      @addMessage(template)
 
     initialize: ->
       playerData.player1 = $("input[name='pl-1']").val()
@@ -43,7 +43,7 @@ $ ->
         o: {}
         gameOver: true
 
-      @addMessage "Play Again?"
+      @addMessage "<a href='JavaScript:void(0)' class='play-again'>Play Again?</a>"
       if winningParty is "none"
         @.addAlert "The game was a tie."
 
@@ -129,13 +129,11 @@ $ ->
         scrollTop: $(".alerts").offset().top
         ,  'slow'
       )
-    addMessage: (msg = "", nonVoidTag = "a" , classes = "play-again", replaceContents = true,  voidAnchor = true) ->
+    addMessage: (msg = "", replaceContents = true) ->
       messagesContainer = $("#messages")
       messagesContainer.hide()
       if replaceContents then messagesContainer.html ""
-      if voidAnchor and nonVoidTag is 'a' then addHref =  'href=\'JavaScript:void(0)\'' else addHref = ""
-      if msg then messagesContainer.append("<#{nonVoidTag} #{addHref} class='#{classes}'> #{msg} </#{nonVoidTag}>")
-      else messagesContainer.html ""
+      if msg then messagesContainer.html msg
       messagesContainer.fadeIn 700
 
 
