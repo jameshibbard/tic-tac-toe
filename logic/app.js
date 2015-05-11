@@ -10,7 +10,7 @@
         gameOver: false
       },
       assignRoles: function() {
-        var player1, player2, randomRole, randomRole2, roles;
+        var randomRole, randomRole2, roles, template;
         roles = ["X", "O"];
         randomRole = roles[Math.floor(Math.random() * roles.length)];
         if (randomRole === "X") {
@@ -22,15 +22,34 @@
         playerData.rolep2 = {};
         playerData.rolep1[randomRole] = true;
         playerData.rolep2[randomRole2] = true;
-        player1 = "<p>" + playerData.player1 + " is playing " + randomRole + " </p>";
-        player2 = "<p> " + playerData.player2 + " is playing " + randomRole2 + " </p>";
-        return $("#messages").html("").append("<p>X starts first!</p>").append(player1).append(player2).append("<p>" + playerData.player1 + " has " + playerData.p1stats.wins + " wins and " + playerData.p1stats.loses + " loses</p>").append("<p>" + playerData.player2 + " has " + playerData.p2stats.wins + " wins and " + playerData.p2stats.loses + " loses</p>").show('slow');
+        template = "<p>X starts first!</p>";
+        template += "<p>" + playerData.player1 + " is playing " + randomRole + "</p>";
+        template += "<p>" + playerData.player2 + " is playing " + randomRole2 + "</p>";
+        template += "<p>" + playerData.player1 + " has " + playerData.p1stats.wins + " wins and " + playerData.p1stats.loses + " loses</p>";
+        template += "<p>" + playerData.player2 + " has " + playerData.p2stats.wins + " wins and " + playerData.p2stats.loses + " loses</p>";
+        return this.addMessage(template);
       },
       initialize: function() {
         var tic, _i;
+        playerData.player1 = $("input[name='pl-1']").val();
+        playerData.player2 = $("input[name='pl-2']").val();
+        playerData.p1stats = localStorage[playerData.player1] || {
+          wins: 0,
+          loses: 0
+        };
+        if (typeof playerData.p1stats === "string") {
+          playerData.p1stats = JSON.parse(playerData.p1stats);
+        }
+        playerData.p2stats = localStorage[playerData.player2] || {
+          wins: 0,
+          loses: 0
+        };
+        if (typeof playerData.p2stats === "string") {
+          playerData.p2stats = JSON.parse(playerData.p2stats);
+        }
         $("form").hide('slow');
         $("#tic").html("");
-        $(".alerts").hide(900);
+        $(".alerts").slideUp(900);
         this.data.gameOver = false;
         for (tic = _i = 0; _i <= 8; tic = ++_i) {
           $("<div class='tic'>").appendTo("#tic");
@@ -45,10 +64,9 @@
           o: {},
           gameOver: true
         };
-        $("#messages").html("");
+        this.addMessage("<a href='JavaScript:void(0)' class='play-again'>Play Again?</a>");
         if (winningParty === "none") {
           this.addAlert("The game was a tie.");
-          $("#messages").html("<a href='JavaScript:void(0)' class='play-again'>Play Again?</a>");
           return false;
         }
         if (playerData.rolep1[winningParty] != null) {
@@ -62,8 +80,7 @@
           ++playerData.p2stats.loses;
         }
         localStorage[playerData.player1] = JSON.stringify(playerData.p1stats);
-        localStorage[playerData.player2] = JSON.stringify(playerData.p2stats);
-        return $("#messages").html("<a href='JavaScript:void(0)' class='play-again'>Play Again?</a>");
+        return localStorage[playerData.player2] = JSON.stringify(playerData.p2stats);
       },
       checkWin: function() {
         var key, value, _ref, _ref1, _results;
@@ -159,40 +176,47 @@
         });
       },
       addAlert: function(msg) {
-        $("p.gameAlert").fadeOut('slow').remove();
+        $("p.gameAlert").slideUp('slow').remove();
         $(".alerts").append("<p class='gameAlert'> " + msg + " </p>");
-        $(".alerts").show("slow");
+        $(".alerts").slideDown("slow");
         return $("body").animate({
           scrollTop: $(".alerts").offset().top
         }, 'slow');
+      },
+      addMessage: function(msg, replaceContents) {
+        var messagesContainer;
+        if (msg == null) {
+          msg = "";
+        }
+        if (replaceContents == null) {
+          replaceContents = true;
+        }
+        messagesContainer = $("#messages");
+        messagesContainer.hide();
+        if (replaceContents) {
+          messagesContainer.html("");
+        }
+        if (msg) {
+          messagesContainer.html(msg);
+        }
+        return messagesContainer.fadeIn(700);
       }
     };
     playerData = {};
     $("form").on("submit", function(evt) {
+      var namesValid;
       evt.preventDefault();
-      playerData.player1 = $("input[name='pl-1']").val();
-      playerData.player2 = $("input[name='pl-2']").val();
-      if (!playerData.player1 || !playerData.player2) {
+      namesValid = $("input[type='text']").filter(function() {
+        return this.value.trim() !== "";
+      }).length === 2;
+      if (namesValid) {
+        return Tic.initialize();
+      } else {
         return Tic.addAlert("Player names cannot be empty");
       }
-      playerData.p1stats = localStorage[playerData.player1] || {
-        wins: 0,
-        loses: 0
-      };
-      if (typeof playerData.p1stats === "string") {
-        playerData.p1stats = JSON.parse(playerData.p1stats);
-      }
-      playerData.p2stats = localStorage[playerData.player2] || {
-        wins: 0,
-        loses: 0
-      };
-      if (typeof playerData.p2stats === "string") {
-        playerData.p2stats = JSON.parse(playerData.p2stats);
-      }
-      return Tic.initialize();
     });
     $(".close").click(function() {
-      return $(this).parents(".alerts").hide('slow');
+      return $(this).parent().slideUp('slow');
     });
     return $("body").on("click", ".play-again", function() {
       return Tic.initialize();

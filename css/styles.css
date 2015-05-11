@@ -51,7 +51,9 @@
 .alerts {
     font-size: 24px;
     text-align: center;
+
 }
+
 
 form div:last-of-type {
     margin-top: 10px;
@@ -63,4 +65,14 @@ form div:last-of-type {
 
 a.play-again {
     font-size: 1.3em;
+}
+
+
+@media all and (max-width: 1020px) {
+    #messages p, #messages a {
+        text-align: center;
+    }
+
+
+
 }

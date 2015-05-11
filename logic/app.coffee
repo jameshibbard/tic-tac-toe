@@ -13,18 +13,25 @@ $ ->
       playerData.rolep2 = {}
       playerData.rolep1[randomRole] = true
       playerData.rolep2[randomRole2] = true
-      player1 = "<p>#{playerData.player1} is playing #{randomRole} </p>"
-      player2 = "<p> #{playerData.player2} is playing #{randomRole2} </p>"
-      $("#messages").html ""
-      .append("<p>X starts first!</p>").append(player1).append player2
-      .append("<p>#{playerData.player1} has #{playerData.p1stats.wins} wins and #{playerData.p1stats.loses} loses</p>")
-      .append("<p>#{playerData.player2} has #{playerData.p2stats.wins} wins and #{playerData.p2stats.loses} loses</p>")
-      .show 'slow'
+
+
+      template = "<p>X starts first!</p>"
+      template += "<p>#{playerData.player1} is playing #{randomRole}</p>"
+      template += "<p>#{playerData.player2} is playing #{randomRole2}</p>"
+      template += "<p>#{playerData.player1} has #{playerData.p1stats.wins} wins and #{playerData.p1stats.loses} loses</p>"
+      template += "<p>#{playerData.player2} has #{playerData.p2stats.wins} wins and #{playerData.p2stats.loses} loses</p>"
+      @addMessage(template)
 
     initialize: ->
+      playerData.player1 = $("input[name='pl-1']").val()
+      playerData.player2 = $("input[name='pl-2']").val()
+      playerData.p1stats = localStorage[playerData.player1] || wins: 0, loses: 0
+      if typeof playerData.p1stats is "string" then playerData.p1stats = JSON.parse playerData.p1stats
+      playerData.p2stats = localStorage[playerData.player2] || wins: 0, loses: 0
+      if typeof playerData.p2stats is "string" then playerData.p2stats = JSON.parse playerData.p2stats
       $("form").hide 'slow'
       $("#tic").html("")
-      $(".alerts").hide 900
+      $(".alerts").slideUp 900
       @data.gameOver = false
       $("<div class='tic'>").appendTo("#tic") for tic in [0..8]
       @.addListeners()
@@ -36,10 +43,10 @@ $ ->
         o: {}
         gameOver: true
 
-      $("#messages").html ""
+      @addMessage "<a href='JavaScript:void(0)' class='play-again'>Play Again?</a>"
       if winningParty is "none"
         @.addAlert "The game was a tie."
-        $("#messages").html "<a href='JavaScript:void(0)' class='play-again'>Play Again?</a>"
+
         return false
 
       if playerData.rolep1[winningParty]? then ++playerData.p1stats.wins else ++playerData.p1stats.loses
@@ -47,7 +54,6 @@ $ ->
 
       localStorage[playerData.player1] = JSON.stringify playerData.p1stats
       localStorage[playerData.player2] = JSON.stringify playerData.p2stats
-      $("#messages").html "<a href='JavaScript:void(0)' class='play-again'>Play Again?</a>"
     checkWin: ->
 
       for key,value of @.data.x
@@ -116,25 +122,29 @@ $ ->
           Tic.checkEnd()
           if Tic.data.gameOver isnt yes and $(".moved").length >= 9 then Tic.addToScore("none")
     addAlert: (msg) ->
-      $("p.gameAlert").fadeOut('slow').remove()
+      $("p.gameAlert").slideUp('slow').remove()
       $(".alerts").append "<p class='gameAlert'> #{msg} </p>"
-      $(".alerts").show "slow"
+      $(".alerts").slideDown "slow"
       $("body").animate(
         scrollTop: $(".alerts").offset().top
         ,  'slow'
       )
+    addMessage: (msg = "", replaceContents = true) ->
+      messagesContainer = $("#messages")
+      messagesContainer.hide()
+      if replaceContents then messagesContainer.html ""
+      if msg then messagesContainer.html msg
+      messagesContainer.fadeIn 700
+
 
   playerData = {}
+
   $("form").on "submit", (evt) ->
     evt.preventDefault()
-    playerData.player1 = $("input[name='pl-1']").val()
-    playerData.player2 = $("input[name='pl-2']").val()
-    if not playerData.player1 or not playerData.player2 then return Tic.addAlert("Player names cannot be empty")
-    playerData.p1stats = localStorage[playerData.player1] || wins: 0, loses: 0
-    if typeof playerData.p1stats is "string" then playerData.p1stats = JSON.parse playerData.p1stats
-    playerData.p2stats = localStorage[playerData.player2] || wins: 0, loses: 0
-    if typeof playerData.p2stats is "string" then playerData.p2stats = JSON.parse playerData.p2stats
-    Tic.initialize()
+    namesValid = $("input[type='text']").filter(->
+      return @.value.trim() isnt ""
+    ).length is 2
+    if namesValid then Tic.initialize() else Tic.addAlert("Player names cannot be empty")
   $(".close").click ->
-    $(@).parents(".alerts").hide 'slow'
+    $(@).parent().slideUp 'slow'
   $("body").on("click",".play-again", -> Tic.initialize())
