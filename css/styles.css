@@ -54,6 +54,7 @@ header div {
     color: #3997ff ;
 }
 
+
 .board, .notice {
     display: none;
 }
@@ -93,7 +94,8 @@ a.play-again {
     padding: 1em;
     text-align: center;
     background-color: beige;
-    clear: none;
+
+
 }
 
 

@@ -174,18 +174,20 @@
         });
       },
       addAlert: function(msg, position) {
+        var notice;
         if (position == null) {
           position = '';
         }
         if (position === 'center') {
-          return $("header div").html("").append("<p class='gameAlert'> " + msg + " </p>").slideDown('slow');
+          notice = $("header div");
         } else {
-          $("div.notice").children().remove();
-          $("div.notice").append("<p class='gameAlert'> " + msg + " </p>").slideDown('slow');
-          return $("body").animate({
-            scrollTop: $("div.notice").offset().top
-          }, 'slow');
+          notice = $("div.notice");
         }
+        notice.children().remove();
+        notice.append("<p class='gameAlert'> " + msg + " </p>").slideDown('slow');
+        return $("body").animate({
+          scrollTop: notice.offset().top
+        }, 'slow');
       },
       addMessage: function(msg, replaceContents) {
         var messagesContainer;
@@ -202,9 +204,7 @@
         if (msg) {
           messagesContainer.append(msg);
         }
-        return messagesContainer.css({
-          "display": "inline-block"
-        }).show();
+        return messagesContainer.css("display", "inline-block").show();
       }
     };
     $("form").on("submit", function(evt) {

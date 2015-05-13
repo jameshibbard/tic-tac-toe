@@ -13,8 +13,6 @@ $ ->
       @data.rolep2 = {}
       @data.rolep1[randomRole] = true
       @data.rolep2[randomRole2] = true
-
-
       tpl = "<p>X starts first!</p>"
       tpl += "<p>#{@data.player1} is playing #{randomRole}</p>"
       tpl += "<p>#{@data.player2} is playing #{randomRole2}</p>"
@@ -119,24 +117,19 @@ $ ->
           Tic.checkEnd()
           if Tic.data.gameOver isnt yes and $(".moved").length >= 9 then Tic.addToScore("none")
     addAlert: (msg, position = '') ->
-      if (position is 'center')
-        $("header div").html("")
-        .append "<p class='gameAlert'> #{msg} </p>"
-        .slideDown 'slow'
-      else
-        $("div.notice")
-        .children().remove()
-        $("div.notice").append "<p class='gameAlert'> #{msg} </p>"
-        .slideDown 'slow'
-        $("body").animate(
-          scrollTop: $("div.notice").offset().top
-          ,  'slow'
+      if position is 'center' then notice = $("header div") else notice = $("div.notice")
+      notice.children().remove()
+      notice.append "<p class='gameAlert'> #{msg} </p>"
+      .slideDown 'slow'
+      $("body").animate(
+        scrollTop: notice.offset().top
+        ,  'slow'
       )
     addMessage: (msg = "", replaceContents = true) ->
       messagesContainer = $(".board")
       if replaceContents then messagesContainer.children().not("div").remove()
       if msg then messagesContainer.append msg
-      messagesContainer.css("display" : "inline-block").show()
+      messagesContainer.css("display", "inline-block").show()
 
   $("form").on "submit", (evt) ->
     evt.preventDefault()
