@@ -1,21 +1,30 @@
-#messages h1 {
-    font-size: 1.8em;
-}
+
 * {
     font-family: 'Chewy', cursive;
 }
 
-#messages p:first-letter {
-    font-size: 1.3em;
+body {
+    margin: 2em;
 }
 
-#messages p {
+
+.board p {
     color: #7f7f7e;
+    font-size: 1.2em;
 }
 
-#messages {
-    margin: 10px;
+header div {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+    width: 25%;
+    margin: 0 auto;
+    padding: 0.6em;
+    display: none;
+    font-size: 1.25em;
+    margin-bottom: 0.7em;
 }
+
 
 .tic {
     width: 30%;
@@ -33,6 +42,7 @@
     float: left;
     font-size: 68px;
     text-align: center;
+    margin-bottom: 10px;
 
 }
 
@@ -44,35 +54,67 @@
     color: #3997ff ;
 }
 
-#messages {
+.board, .notice {
     display: none;
 }
 
-.alerts {
+.notice {
     font-size: 24px;
     text-align: center;
 
-}
 
+}
+form {
+    clear: both;
+    width: 50%;
+    margin: 0 auto;
+}
 
 form div:last-of-type {
     margin-top: 10px;
 }
 
-.alert-info.alerts {
-    display: none;
-}
+
 
 a.play-again {
     font-size: 1.3em;
 }
 
 
-@media all and (max-width: 1020px) {
-    #messages p, #messages a {
-        text-align: center;
+#tic {
+    max-width: 600px;
+    width: 60%;
+
+}
+
+.board {
+    max-width: 250px;
+    width: 35%;
+    padding: 1em;
+    text-align: center;
+    background-color: beige;
+    clear: none;
+}
+
+
+@media all and (max-width: 450px) {
+    #tic {
+        width: 100%;
+    }
+    .board {
+        width: 100%;
+
     }
 
+    form {
+        width: 100%;
+    }
+}
 
 
+
+@media all and (min-width: 1080px) {
+    #tic {
+        margin: 0 auto;
+    }
 }
