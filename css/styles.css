@@ -99,6 +99,11 @@ a.play-again {
 
 }
 
+header div {
+    max-width: 400px;
+    width: 100%;
+}
+
 
 @media all and (max-width: 450px) {
     #tic {
@@ -111,9 +116,7 @@ a.play-again {
     form {
         width: 100%;
     }
-    header div {
-        width: 100%;
-    }
+
 
 }
 
