@@ -9,30 +9,20 @@
         o: {},
         gameOver: false
       },
-      assignRoles: function() {
-        var randomRole, randomRole2, roles, tpl;
-        roles = ["X", "O"];
-        randomRole = roles[Math.floor(Math.random() * roles.length)];
-        if (randomRole === "X") {
-          randomRole2 = "O";
-        } else {
-          randomRole2 = "X";
-        }
-        this.data.rolep1 = {};
-        this.data.rolep2 = {};
-        this.data.rolep1[randomRole] = true;
-        this.data.rolep2[randomRole2] = true;
-        tpl = "<p>X starts first!</p>";
-        tpl += "<p>" + this.data.player1 + " is playing " + randomRole + "</p>";
-        tpl += "<p>" + this.data.player2 + " is playing " + randomRole2 + "</p>";
-        tpl += "<p>" + this.data.player1 + " has " + this.data.p1stats.wins + " wins and " + this.data.p1stats.loses + " loses</p>";
-        tpl += "<p>" + this.data.player2 + " has " + this.data.p2stats.wins + " wins and " + this.data.p2stats.loses + " loses</p>";
-        return this.addMessage(tpl);
-      },
       initialize: function() {
-        var tic, _i;
+        this.data.gameOver = false;
+        this.setPlayerNames();
+        this.retrieveStats();
+        this.prepareBoard();
+        this.assignRoles();
+        this.setUpNotifications();
+        return this.addListeners();
+      },
+      setPlayerNames: function() {
         this.data.player1 = $("input[name='pl-1']").val();
-        this.data.player2 = $("input[name='pl-2']").val();
+        return this.data.player2 = $("input[name='pl-2']").val();
+      },
+      retrieveStats: function() {
         this.data.p1stats = localStorage[this.data.player1] || {
           wins: 0,
           loses: 0
@@ -45,26 +35,66 @@
           loses: 0
         };
         if (typeof this.data.p2stats === "string") {
-          this.data.p2stats = JSON.parse(this.data.p2stats);
+          return this.data.p2stats = JSON.parse(this.data.p2stats);
         }
-        $("form").hide('slow');
-        $("#tic").html("");
-        $(".notice, header div").slideUp('slow');
-        this.data.gameOver = false;
-        for (tic = _i = 0; _i <= 8; tic = ++_i) {
-          $("<div class='tic'>").appendTo("#tic");
+      },
+      prepareBoard: function() {
+        var square, _i, _results;
+        $("form").hide();
+        $("#board").empty();
+        $(".alerts").removeClass("welcome").show().text("X Goes First");
+        $(".notifications").empty().show();
+        _results = [];
+        for (square = _i = 0; _i <= 8; square = ++_i) {
+          _results.push($("<div>", {
+            "class": "square"
+          }).appendTo("#board"));
         }
-        this.addListeners();
-        return this.assignRoles();
+        return _results;
+      },
+      assignRoles: function() {
+        var roles;
+        roles = ["X", "O"].sort(function() {
+          return 0.5 - Math.random();
+        });
+        this.data.rolep1 = roles[0];
+        return this.data.rolep2 = roles[1];
+      },
+      setUpNotifications: function() {
+        this.addNotification(this.data.player1 + " is playing " + this.data.rolep1);
+        this.addNotification(this.data.player2 + " is playing " + this.data.rolep2);
+        this.addNotification(this.data.player1 + " has " + this.data.p1stats.wins + " wins and " + this.data.p1stats.loses + " loses");
+        return this.addNotification(this.data.player2 + " has " + this.data.p2stats.wins + " wins and " + this.data.p2stats.loses + " loses");
+      },
+      addNotification: function(msg) {
+        return $(".notifications").append($("<p>", {
+          text: msg
+        }));
+      },
+      addListeners: function() {
+        return $(".square").click(function() {
+          if (Tic.data.gameOver === false && !$(this).text().length) {
+            if (Tic.data.turns % 2 === 0) {
+              $(this).html("X").addClass("x moved");
+            } else if (Tic.data.turns % 2 !== 0) {
+              $(this).html("O").addClass("o moved");
+            }
+            Tic.data.turns++;
+            Tic.checkEnd();
+            if (Tic.data.gameOver !== true && $(".moved").length >= 9) {
+              return Tic.addToScore("none");
+            }
+          }
+        });
       },
       addToScore: function(winningParty) {
         this.data.turns = 0;
         this.data.x = {};
         this.data.o = {};
         this.data.gameOver = true;
-        this.addMessage("<a href='JavaScript:void(0)' class='play-again'>Play Again?</a>");
+        $(".notifications").append("<a class='play-again'>Play Again?</a>");
         if (winningParty === "none") {
-          this.addAlert("The game was a tie.");
+          this.showAlert("The game was a tie");
           return false;
         }
         if (this.data.rolep1[winningParty] != null) {
@@ -87,7 +117,7 @@
           value = _ref[key];
           if (value >= 3) {
             localStorage.x++;
-            this.addAlert("X wins");
+            this.showAlert("X wins");
             this.data.gameOver = true;
             this.addToScore("X");
           }
@@ -98,7 +128,7 @@
           value = _ref1[key];
           if (value >= 3) {
             localStorage.o++;
-            this.addAlert("O wins");
+            this.showAlert("O wins");
             this.data.gameOver = true;
             _results.push(this.addToScore("O"));
           } else {
@@ -143,13 +173,13 @@
         return this.data.o[storageVar] = null;
       },
       checkField: function(field, storageVar) {
-        if ($(".tic").eq(field).hasClass("x")) {
+        if ($(".square").eq(field).hasClass("x")) {
           if (this.data.x[storageVar] != null) {
             return this.data.x[storageVar]++;
           } else {
             return this.data.x[storageVar] = 1;
           }
-        } else if ($(".tic").eq(field).hasClass("o")) {
+        } else if ($(".square").eq(field).hasClass("o")) {
           if (this.data.o[storageVar] != null) {
             return this.data.o[storageVar]++;
           } else {
@@ -157,70 +187,25 @@
           }
         }
       },
-      addListeners: function() {
-        return $(".tic").click(function() {
-          if (Tic.data.gameOver === false && !$(this).text().length) {
-            if (Tic.data.turns % 2 === 0) {
-              $(this).html("X").addClass("x moved");
-            } else if (Tic.data.turns % 2 !== 0) {
-              $(this).html("O").addClass("o moved");
-            }
-            Tic.data.turns++;
-            Tic.checkEnd();
-            if (Tic.data.gameOver !== true && $(".moved").length >= 9) {
-              return Tic.addToScore("none");
-            }
-          }
-        });
-      },
-      addAlert: function(msg, position) {
-        var notice;
-        if (position == null) {
-          position = '';
-        }
-        if (position === 'center') {
-          notice = $("header div");
-        } else {
-          notice = $("div.notice");
-        }
-        notice.children().remove();
-        notice.append("<p class='gameAlert'> " + msg + " </p>").slideDown('slow');
-        return $("body").animate({
-          scrollTop: notice.offset().top
-        }, 'slow');
-      },
-      addMessage: function(msg, replaceContents) {
-        var messagesContainer;
-        if (msg == null) {
-          msg = "";
-        }
-        if (replaceContents == null) {
-          replaceContents = true;
-        }
-        messagesContainer = $(".board");
-        if (replaceContents) {
-          messagesContainer.children().not("div").remove();
-        }
-        if (msg) {
-          messagesContainer.append(msg);
-        }
-        return messagesContainer.css("display", "inline-block").show();
+      showAlert: function(msg) {
+        return $(".alerts").text(msg).slideDown();
       }
     };
     $("form").on("submit", function(evt) {
-      var namesValid;
+      var $inputs, namesIndentical, namesNotEntered;
       evt.preventDefault();
-      namesValid = $("input[type='text']").filter(function() {
+      $inputs = $("input[type='text']");
+      namesNotEntered = $inputs.filter(function() {
         return this.value.trim() !== "";
-      }).length === 2 && $("input:text").eq(0).val() !== $("input:text").eq(1).val();
-      if (namesValid) {
-        return Tic.initialize();
+      }).length !== 2;
+      namesIndentical = $inputs[0].value === $inputs[1].value;
+      if (namesNotEntered) {
+        return Tic.showAlert("Player names cannot be empty");
+      } else if (namesIndentical) {
+        return Tic.showAlert("Player names cannot be identical");
       } else {
-        return Tic.addAlert("Player names cannot be empty or the same", 'center');
+        return Tic.initialize();
       }
-    });
-    $(".close").click(function() {
-      return $(this).parent().slideUp('slow');
     });
     return $("body").on("click", ".play-again", function() {
       return Tic.initialize();
