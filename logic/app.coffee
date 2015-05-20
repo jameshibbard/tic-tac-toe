@@ -10,9 +10,9 @@ $ ->
       @data.gameOver = false
       @.setPlayerNames()
       @.retrieveStats()
-      @.prepareBoard()
       @.assignRoles()
-      @.setUpNotifications()
+      @.prepareBoard()
+      @.updateNotifications()
       @.addListeners()
 
     setPlayerNames: ->
@@ -25,11 +25,15 @@ $ ->
       @data.p2stats = localStorage[@data.player2] || wins: 0, loses: 0
       if typeof @data.p2stats is "string" then @data.p2stats = JSON.parse @data.p2stats
 
+    getPlayerName: (symbol) ->
+      name = if @data.rolep1 == symbol then @data.player1 else @data.player2
+      return name
+
     prepareBoard: ->
       $("form").hide()
       $("#board").empty()
-      $(".alerts").removeClass("welcome").show().text("X Goes First")
-      $(".notifications").empty().show()
+      $(".alerts").removeClass("welcome").show()
+      $(".alerts").text("#{@.getPlayerName("X")} Goes First")
       $("<div>", {class: "square"}).appendTo("#board") for square in [0..8]
 
     assignRoles: ->
@@ -39,7 +43,8 @@ $ ->
       @data.rolep1 = roles[0]
       @data.rolep2 = roles[1]
 
-    setUpNotifications: ->
+    updateNotifications: ->
+      $(".notifications").empty().show()
       @.addNotification "#{@data.player1} is playing #{@data.rolep1}"
       @.addNotification "#{@data.player2} is playing #{@data.rolep2}"
       @.addNotification "#{@data.player1} has #{@data.p1stats.wins} wins and #{@data.p1stats.loses} loses"
@@ -48,7 +53,7 @@ $ ->
     addNotification: (msg) ->
       $(".notifications").append($("<p>", {text: msg}));
 
-    addListeners  : ->
+    addListeners: ->
       $(".square").click ->
         if Tic.data.gameOver is no and not $(@).text().length
           if Tic.data.turns % 2 is 0 then $(@).html("X").addClass("x moved")
@@ -62,28 +67,29 @@ $ ->
       @data.x = {}
       @data.o = {}
       @data.gameOver = yes
-      $(".notifications").append "<a class='play-again'>Play Again?</a>"
       if winningParty is "none"
         @.showAlert "The game was a tie"
-        return false
-      if @data.rolep1[winningParty]? then ++@data.p1stats.wins else ++@data.p1stats.loses
-      if @data.rolep2[winningParty]? then ++@data.p2stats.wins else ++@data.p2stats.loses
-      localStorage[@data.player1] = JSON.stringify @data.p1stats
-      localStorage[@data.player2] = JSON.stringify @data.p2stats
+      else
+        if @data.rolep1 == winningParty then ++@data.p1stats.wins else ++@data.p1stats.loses
+        if @data.rolep2 == winningParty then ++@data.p2stats.wins else ++@data.p2stats.loses
+        localStorage[@data.player1] = JSON.stringify @data.p1stats
+        localStorage[@data.player2] = JSON.stringify @data.p2stats
+      @.updateNotifications()
+      $(".notifications").append "<a class='play-again'>Play Again?</a>"
 
     checkWin: ->
       for key,value of @.data.x
         if value >= 3
           localStorage.x++
-          @.showAlert "X wins"
+          @.showAlert "#{@.getPlayerName("X")} wins"
           @.data.gameOver = true
-          @addToScore("X")
+          @.addToScore("X")
       for key,value of @.data.o
         if value >= 3
           localStorage.o++
-          @.showAlert "O wins"
+          @.showAlert "#{@.getPlayerName("O")} wins"
           @.data.gameOver = true
-          @addToScore("O")
+          @.addToScore("O")
 
     checkEnd : ->
       @.data.x = {}

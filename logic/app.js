@@ -13,9 +13,9 @@
         this.data.gameOver = false;
         this.setPlayerNames();
         this.retrieveStats();
-        this.prepareBoard();
         this.assignRoles();
-        this.setUpNotifications();
+        this.prepareBoard();
+        this.updateNotifications();
         return this.addListeners();
       },
       setPlayerNames: function() {
@@ -38,12 +38,17 @@
           return this.data.p2stats = JSON.parse(this.data.p2stats);
         }
       },
+      getPlayerName: function(symbol) {
+        var name;
+        name = this.data.rolep1 === symbol ? this.data.player1 : this.data.player2;
+        return name;
+      },
       prepareBoard: function() {
         var square, _i, _results;
         $("form").hide();
         $("#board").empty();
-        $(".alerts").removeClass("welcome").show().text("X Goes First");
-        $(".notifications").empty().show();
+        $(".alerts").removeClass("welcome").show();
+        $(".alerts").text((this.getPlayerName("X")) + " Goes First");
         _results = [];
         for (square = _i = 0; _i <= 8; square = ++_i) {
           _results.push($("<div>", {
@@ -60,7 +65,8 @@
         this.data.rolep1 = roles[0];
         return this.data.rolep2 = roles[1];
       },
-      setUpNotifications: function() {
+      updateNotifications: function() {
+        $(".notifications").empty().show();
         this.addNotification(this.data.player1 + " is playing " + this.data.rolep1);
         this.addNotification(this.data.player2 + " is playing " + this.data.rolep2);
         this.addNotification(this.data.player1 + " has " + this.data.p1stats.wins + " wins and " + this.data.p1stats.loses + " loses");
@@ -92,23 +98,24 @@
         this.data.x = {};
         this.data.o = {};
         this.data.gameOver = true;
-        $(".notifications").append("<a class='play-again'>Play Again?</a>");
         if (winningParty === "none") {
           this.showAlert("The game was a tie");
-          return false;
-        }
-        if (this.data.rolep1[winningParty] != null) {
-          ++this.data.p1stats.wins;
         } else {
-          ++this.data.p1stats.loses;
+          if (this.data.rolep1 === winningParty) {
+            ++this.data.p1stats.wins;
+          } else {
+            ++this.data.p1stats.loses;
+          }
+          if (this.data.rolep2 === winningParty) {
+            ++this.data.p2stats.wins;
+          } else {
+            ++this.data.p2stats.loses;
+          }
+          localStorage[this.data.player1] = JSON.stringify(this.data.p1stats);
+          localStorage[this.data.player2] = JSON.stringify(this.data.p2stats);
         }
-        if (this.data.rolep2[winningParty] != null) {
-          ++this.data.p2stats.wins;
-        } else {
-          ++this.data.p2stats.loses;
-        }
-        localStorage[this.data.player1] = JSON.stringify(this.data.p1stats);
-        return localStorage[this.data.player2] = JSON.stringify(this.data.p2stats);
+        this.updateNotifications();
+        return $(".notifications").append("<a class='play-again'>Play Again?</a>");
       },
       checkWin: function() {
         var key, value, _ref, _ref1, _results;
@@ -117,7 +124,7 @@
           value = _ref[key];
           if (value >= 3) {
             localStorage.x++;
-            this.showAlert("X wins");
+            this.showAlert((this.getPlayerName("X")) + " wins");
             this.data.gameOver = true;
             this.addToScore("X");
           }
@@ -128,7 +135,7 @@
           value = _ref1[key];
           if (value >= 3) {
             localStorage.o++;
-            this.showAlert("O wins");
+            this.showAlert((this.getPlayerName("O")) + " wins");
             this.data.gameOver = true;
             _results.push(this.addToScore("O"));
           } else {
