@@ -62,35 +62,6 @@ $ ->
           Tic.checkEnd()
           if Tic.data.gameOver isnt yes and $(".moved").length >= 9 then Tic.addToScore("none")
 
-    addToScore: (winningParty) ->
-      @data.turns = 0
-      @data.x = {}
-      @data.o = {}
-      @data.gameOver = yes
-      if winningParty is "none"
-        @.showAlert "The game was a tie"
-      else
-        if @data.rolep1 == winningParty then ++@data.p1stats.wins else ++@data.p1stats.loses
-        if @data.rolep2 == winningParty then ++@data.p2stats.wins else ++@data.p2stats.loses
-        localStorage[@data.player1] = JSON.stringify @data.p1stats
-        localStorage[@data.player2] = JSON.stringify @data.p2stats
-      @.updateNotifications()
-      $(".notifications").append "<a class='play-again'>Play Again?</a>"
-
-    checkWin: ->
-      for key,value of @.data.x
-        if value >= 3
-          localStorage.x++
-          @.showAlert "#{@.getPlayerName("X")} wins"
-          @.data.gameOver = true
-          @.addToScore("X")
-      for key,value of @.data.o
-        if value >= 3
-          localStorage.o++
-          @.showAlert "#{@.getPlayerName("O")} wins"
-          @.data.gameOver = true
-          @.addToScore("O")
-
     checkEnd : ->
       @.data.x = {}
       @.data.o = {}
@@ -119,15 +90,44 @@ $ ->
         @.checkWin()
         @.emptyStorageVar('horizontal')
 
-    emptyStorageVar: (storageVar) ->
-      @.data.x[storageVar] = null
-      @.data.o[storageVar] = null
-
     checkField: (field, storageVar) ->
       if $(".square").eq(field).hasClass("x")
         if @.data.x[storageVar]? then @.data.x[storageVar]++ else @.data.x[storageVar] = 1
       else if $(".square").eq(field).hasClass("o")
         if @.data.o[storageVar]? then @.data.o[storageVar]++ else @.data.o[storageVar] = 1
+
+    checkWin: ->
+      for key,value of @.data.x
+        if value >= 3
+          localStorage.x++
+          @.showAlert "#{@.getPlayerName("X")} wins"
+          @.data.gameOver = true
+          @.addToScore("X")
+      for key,value of @.data.o
+        if value >= 3
+          localStorage.o++
+          @.showAlert "#{@.getPlayerName("O")} wins"
+          @.data.gameOver = true
+          @.addToScore("O")
+
+    addToScore: (winningParty) ->
+      @data.turns = 0
+      @data.x = {}
+      @data.o = {}
+      @data.gameOver = yes
+      if winningParty is "none"
+        @.showAlert "The game was a tie"
+      else
+        if @data.rolep1 == winningParty then ++@data.p1stats.wins else ++@data.p1stats.loses
+        if @data.rolep2 == winningParty then ++@data.p2stats.wins else ++@data.p2stats.loses
+        localStorage[@data.player1] = JSON.stringify @data.p1stats
+        localStorage[@data.player2] = JSON.stringify @data.p2stats
+      @.updateNotifications()
+      $(".notifications").append "<a class='play-again'>Play Again?</a>"
+
+    emptyStorageVar: (storageVar) ->
+      @.data.x[storageVar] = null
+      @.data.o[storageVar] = null
 
     showAlert: (msg) ->
       $(".alerts").text(msg).slideDown()
